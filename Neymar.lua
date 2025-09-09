@@ -7373,3 +7373,178 @@ local args = {
 game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1RPNam1eTex1t"):FireServer(unpack(args))
   end
 })
+
+
+-- إنشاء تاب جديد بواجهة ثانية
+local Main = MakeTab({Name = "اغاني مجانيه"})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local selectedAudioID
+local audioLoop = false
+getgenv().Audio_All_loop_fast = false
+
+local audios = {
+    {Name = "قران 1", ID = 4711690175},
+    {Name = "قرأن 2", ID = 1836685929},
+    {Name = "سب 1", ID = 6536444735},
+    {Name = "سب 2", ID = 7127692762},
+    {Name = "ياميت كوداساي", ID = 108494476595033},
+    {Name = "غريتينيهو", ID = 5710016194},
+    {Name = "جامبسكير هوروروسو", ID = 85435253347146},
+    {Name = "صوت عالي", ID = 6855150757},
+    {Name = "رايحة", ID = 120034877160791},
+    {Name = "جامبسكير 2", ID = 110637995610528},
+    {Name = "ضحكة الساحرة ماين كرافت", ID = 116214940486087},
+    {Name = "ذا بويلد وان", ID = 137177653817621},
+    {Name = "دقيت أبا ماريا ديويدو", ID = 128669424001766},
+    {Name = "ماندريك ديتيكتيد", ID = 9068077052},
+    {Name = "آآآآآااا", ID = 80156405968805},
+    {Name = "آآآآه", ID = 9084006093},
+    {Name = "أمونغاس", ID = 6651571134},
+    {Name = "سوس", ID = 6701126635},
+    {Name = "غريتاو آآآآآاااا", ID = 5853668794},
+    {Name = "أووه كووف كووف", ID = 7056720271},
+    {Name = "سوس", ID = 7153419575},
+    {Name = "سونيك إكس إي", ID = 2496367477},
+    {Name = "توبيرز93 1", ID = 270145703},
+    {Name = "توبيرز93 2", ID = 18131809532},
+    {Name = "ضحكة جون", ID = 130759239},
+    {Name = "ما أعرف كككك", ID = 6549021381},
+    {Name = "غريتو", ID = 80156405968805},
+    {Name = "سوس أوديو", ID = 7705506391},
+    {Name = "آآآه", ID = 7772283448},
+    {Name = "غاي، غاي", ID = 18786647417},
+    {Name = "ضربة بات", ID = 7129073354},
+    {Name = "سيرين نووي", ID = 675587093},
+    {Name = "ما عندي فكرة عن الاسم كك", ID = 7520729342},
+    {Name = "غريتو 2", ID = 91412024101709},
+    {Name = "إستورا تيمبانو", ID = 268116333},
+    {Name = "جميداو", ID = 106835463235574},
+    {Name = "توما جاك", ID = 132603645477541},
+    {Name = "بديت آيفود بديت", ID = 133843750864059},
+    {Name = "آي غوست ذا داون", ID = 84663543883498},
+    {Name = "كومبري أونلاين نا شوب", ID = 8747441609},
+    {Name = "أووه كي نوجو", ID = 103440368630269},
+    {Name = "ساي داي لافا براتو", ID = 101232400175829},
+    {Name = "سيلوكو نو كومبنساسيون", ID = 78442476709262},
+    {Name = "اغنيه 1", ID = 118507373399694},
+    {Name = "يا شباب صلو علي النبي", ID = 9108676586},
+    {Name = "اغنيه 2", ID = 98337901681441},
+    {Name = "اغنيه 3", ID = 93958751571254},
+    {Name = "تن تن", ID = 130352079567406},
+    {Name = "حبيبي يا رسول الله 1", ID = 131597210164474},
+    {Name = "حبيبي يا رسول الله 2", ID = 91545096088459},
+    {Name = "اغنيه 4", ID = 129338532445059},
+    {Name = "فانق بافو دو بافو", ID = 106317184644394},
+}
+
+local audioNames = {}
+for _, audio in ipairs(audios) do
+    table.insert(audioNames, audio.Name)
+end
+
+Main:AddTextBox({
+    Name = "ايدي صوت",
+    PlaceholderText = "",
+    Callback = function(value) selectedAudioID = tonumber(value) end
+})
+
+Main:AddDropdown({
+    Name = "Select Audio",
+    Options = audioNames,
+    Default = audioNames[1],
+    Callback = function(selected)
+        for _, v in ipairs(audios) do
+            if v.Name == selected then
+                selectedAudioID = v.ID
+                break
+            end
+        end
+    end
+})
+
+local function playAudio()
+    if selectedAudioID then
+        local args = {Workspace, selectedAudioID, 1}
+        ReplicatedStorage.RE:FindFirstChild("1Gu1nSound1s"):FireServer(unpack(args))
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://" .. selectedAudioID
+        sound.Parent = Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+        sound:Play()
+    end
+end
+
+local function playLoopedAudio()
+    while audioLoop do
+        playAudio()
+        task.wait(0.5)
+    end
+end
+
+Main:AddButton({
+    Name = "تشغيل الصوت",
+    Callback = function() playAudio() end
+}) 
+Main:AddToggle({
+    Name = "تكرار الصوت",
+    Default = false,
+    Callback = function(value)
+        audioLoop = value
+        if audioLoop then task.spawn(playLoopedAudio) end
+    end
+})
+
+local function Audio_All_ClientSide(ID)
+    local folder = workspace:FindFirstChild("Audio all client")
+    if not folder then
+        folder = Instance.new("Folder")
+        folder.Name = "Audio all client"
+        folder.Parent = workspace
+    end
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://" .. ID
+    sound.Volume = 1
+    sound.Looped = false
+    sound.Parent = folder
+    sound:Play()
+    task.delay(1, function() sound:Destroy() end)
+end
+
+local function Audio_All_ServerSide(ID)
+    if type(ID) ~= "number" then return end
+    local event = ReplicatedStorage:FindFirstChild("1Gu1nSound1s", true)
+    if event then event:FireServer(Workspace, ID, 1) end
+end
+
+Main:AddToggle({
+    Name = "تكرار مزعج",
+    Default = false,
+    Callback = function(Value)
+        getgenv().Audio_All_loop_fast = Value
+        while getgenv().Audio_All_loop_fast do
+            if selectedAudioID then
+                Audio_All_ServerSide(selectedAudioID)
+                task.spawn(function() Audio_All_ClientSide(selectedAudioID) end)
+            end
+            task.wait(0.03)
+        end
+    end
+})
+
+Main:AddToggle({
+    Name = "مزعج صوت",
+    Default = false,
+    Callback = function(state)
+        getgenv().AudioLoop = state
+        while getgenv().AudioLoop and selectedAudioID do
+            if Audio_All_ServerSide then Audio_All_ServerSide(selectedAudioID) end
+            task.spawn(function()
+                if Audio_All_ClientSide then Audio_All_ClientSide(selectedAudioID) end
+            end)
+            task.wait(0.03)
+        end
+    end
+})
